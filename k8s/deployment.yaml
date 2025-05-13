@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: pnb-deops
+  name: pnb-devops            # change name to match repo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pnb-devops
+  template:
+    metadata:
+      labels:
+        app: pnb-deops
+    spec:
+      containers:
+        - image: quay.io/sankapoo/backend-ms:static
+          imagePullPolicy: Always
+          name: pnb-devops   # container name should also match
+          ports:
+            - containerPort: 8080
+              protocol: TCP
