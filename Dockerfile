@@ -1,10 +1,14 @@
-# Use the official PHP 8 image with Apache pre-configured
+# ── Containerfile ──────────────────────────────────────────────────
 FROM php:8.3-apache
 
-# Copy our app into the Apache document root
+# 1. Re-configure Apache to use 8080 and set a harmless ServerName
+RUN sed -i 's/^Listen 80$/Listen 8080/' /etc/apache2/ports.conf \
+ && echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+# 2. Copy your app
 COPY index.php /var/www/html/
 
-# Expose the default web server port
-EXPOSE 80
+# 3. Tell the world (and OpenShift) which port is served
+EXPOSE 8080
 
-# The base image already starts Apache in the foreground, so no CMD needed
+# No CMD needed – base image already calls apache2-foreground
