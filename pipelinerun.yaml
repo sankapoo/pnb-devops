@@ -1,0 +1,36 @@
+apiVersion: tekton.dev/v1          # <-- v1 needs taskRunTemplate
+kind: PipelineRun
+metadata:
+  generateName: build-deploy-api-pipelinerun-   # same “prefix-name” effect
+  namespace: pnb-devops                         # adjust if needed
+spec:
+  # ----------− Task-level defaults (SA, podTemplate, etc.) ----------
+  taskRunTemplate:
+    serviceAccountName: pipeline                # ← replaces old top-level field
+
+  # ----------− Which pipeline to invoke ----------
+  pipelineRef:
+    name: build-and-deploy
+
+  # ----------− Parameters ----------
+  params:
+    - name: deployment-name
+      value: pnb-devops
+    - name: git-url
+      value: https://github.com/sankapoo/pnb-devops.git
+    - name: git-revision
+      value: main
+    # git-revision omitted → pipeline default (“master”) is used
+    - name: IMAGE
+      value: image-registry.openshift-image-registry.svc:5000/pnb-devops/php-ms
+
+  # ----------− Workspaces ----------
+  workspaces:
+    - name: shared-workspace
+      volumeClaimTemplate:
+        metadata: {}            # name is auto-generated
+        spec:
+          accessModes: [ReadWriteOnce]
+          resources:
+            requests:
+              storage: 500Mi
