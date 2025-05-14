@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: pnb-deops
+    app: pnb-devops
   name: pnb-devops            # change name to match repo
 spec:
   replicas: 1
@@ -12,10 +12,10 @@ spec:
   template:
     metadata:
       labels:
-        app: pnb-deops
+        app: pnb-devops
     spec:
       containers:
-        - image: quay.io/sankapoo/backend-ms:static
+        - image: quay.io/sankapoo/backend-ms:php
           imagePullPolicy: Always
           name: pnb-devops   # container name should also match
           ports:
