@@ -1,0 +1,89 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: build-and-deploy
+spec:
+  workspaces:
+    - name: shared-workspace
+  params:
+    - name: deployment-name
+      type: string
+    - name: git-url
+      type: string
+    - name: git-revision
+      type: string
+      default: main
+    - name: IMAGE
+      type: string
+  tasks:
+    # ───────────────────────────────────────────────
+    # 1. Clone the source repo
+    # ───────────────────────────────────────────────
+    - name: fetch-repository
+      taskRef:
+        resolver: cluster
+        params:
+          - name: kind
+            value: task
+          - name: name
+            value: git-clone
+          - name: namespace
+            value: openshift-pipelines
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+      params:
+        - name: URL
+          value: $(params.git-url)
+        - name: SUBDIRECTORY
+          value: ""
+        - name: DELETE_EXISTING
+          value: "true"
+        - name: REVISION
+          value: $(params.git-revision)
+
+    # ───────────────────────────────────────────────
+    # 2. **** build-image task —
+    #    (references the Task you created in openshift-pipelines)
+    # ───────────────────────────────────────────────
+    - name: build-image
+      taskRef:
+        resolver: cluster
+        params:
+          - name: kind
+            value: task
+          - name: name
+            value: build-image         # ← dummy Task name
+          - name: namespace
+            value: openshift-pipelines
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+      runAfter:
+        - fetch-repository             # run right after clone
+
+    # ───────────────────────────────────────────────
+    # 3. Apply Kubernetes manifests from repo
+    # ───────────────────────────────────────────────
+    - name: apply-manifests
+      taskRef:
+        name: apply-manifests
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+      runAfter:
+        - build-image                  # wait for build task
+
+    # ───────────────────────────────────────────────
+    # 4. Patch Deployment to point at $(params.IMAGE)
+    # ───────────────────────────────────────────────
+    - name: update-deployment
+      taskRef:
+        name: update-deployment
+      params:
+        - name: deployment
+          value: $(params.deployment-name)
+        - name: IMAGE
+          value: $(params.IMAGE)
+      runAfter:
+        - apply-manifests
