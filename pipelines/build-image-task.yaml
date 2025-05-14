@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: build-image
+  namespace: openshift-pipelines
+spec:
+  description: "build-image task"
+  params:
+    - name: IMAGE
+      description: "Image parameter"
+      type: string
+    - name: DOCKERFILE
+      description: "Dockerfile parameter "
+      type: string
+  workspaces:
+    - name: source
+  steps:
+    - name: step1
+      image: registry.access.redhat.com/ubi9/ubi-minimal
+      script: |
+        #!/bin/sh
+        echo " build-image task executed. "
