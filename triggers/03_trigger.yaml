@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: backend-ms-trigger
+  name: pnb-devops-trigger
 spec:
   serviceAccountName: pipeline
   interceptors:
@@ -15,9 +15,9 @@ spec:
         - name: "eventTypes"
           value: ["push"]
   bindings:
-    - ref: backend-ms
+    - ref: pnb-devops
   template:
-    ref: backend-ms
+    ref: pnb-devops
 ---
 apiVersion: v1
 kind: Secret
