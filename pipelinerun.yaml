@@ -22,7 +22,8 @@ spec:
       value: main
     # git-revision omitted → pipeline default (“master”) is used
     - name: IMAGE
-      value: image-registry.openshift-image-registry.svc:5000/pnb-devops/php-ms
+      value: quay.io/sankapoo/backend-ms:php
+      #value: image-registry.openshift-image-registry.svc:5000/pnb-devops/php-ms
 
   # ----------− Workspaces ----------
   workspaces:
