@@ -6,7 +6,7 @@ echo "<h2 style='color:#0275d8;font-weight:bold'>
         Greetings from Punjab National Bank
       </h2>";
 
-echo "<p style='font-size:18px'>
+echo "<p style='font-size:23px'>
         We’re delighted to host you  🚀
       </p>";
 
